@@ -2,9 +2,9 @@
 Small collection of Python scripts for music library management. This is a nightmare right now, use at your own risk.
 
 ## TODO
-[ ] Handle non-Latin alphabet in file names.
-[ ] Refactor, is too slow right now.
-[ ] Add user input for formatting preferences (i.e. upper/lowercase, spaces in file/folder names, etc.
+[ ] Handle non-Latin alphabet in file names.\
+[ ] Refactor, is too slow right now.\
+[ ] Add user input for formatting preferences (i.e. upper/lowercase, spaces in file/folder names, etc.\
 
 ## Usage
 Install audio-metadata
