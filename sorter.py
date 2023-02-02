@@ -7,11 +7,15 @@ from pathlib import Path
 libRoot = ""
 libFiles = []
 
-# formats a string to be only alphanumeric characters, no spaces (they're a pain)
+""" Formats a string to be only alphanumeric characters.
+No spaces allowed because they're a pain to navigate.
+"""
 def formatString(string):
     return regex.sub("[^a-zA-Z0-9]", "", str(string))
 
-# build the master file path list
+""" Builds the master file path list through arbitrary traversal
+of the music library's file tree
+"""
 def buildMasterList():
 
     global libFiles
@@ -21,7 +25,10 @@ def buildMasterList():
             filePath = Path.joinpath(Path(root), file)
             libFiles.append(filePath)
 
-# gets the required metadata from each file
+""" Gets metadata from each file path, also includes
+the old file path in the dict for the sake of movement.
+This overwrites each entry in libFiles in succession.
+"""
 def getMetadata():
 
     global libFiles
@@ -47,8 +54,10 @@ def getMetadata():
             }
             
         except:
-            print(str(filePath) + " is not an audio file or is an unsupported format")
+            print("not an audio file")
 
+""" Moves and renames each file according to its metadata
+"""
 def moveRenameFiles():
 
     print("Renaming files")
@@ -64,7 +73,7 @@ def moveRenameFiles():
 
         # this will run if not an audio file i.e. cover art
         except:
-            print("FIX ME")
+            print("not an audio file")
             return
 
         # do nothing if the file already exists
