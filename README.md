@@ -3,14 +3,12 @@ Small collection of Python scripts for music library management. This is a night
 
 ## TODO
 [ ] Handle non-Latin alphabet in file names.\
-[ ] Refactor, is too slow right now.\
-[ ] Add user input for formatting preferences (i.e. upper/lowercase, spaces in file/folder names, etc.\
+[ ] Refactor, is O(N^3) right now, there has to be a better way to do this.\
+[ ] Add user input for formatting preferences (i.e. upper/lowercase, spaces in file/folder names, etc).\
+[ ] Modularize each type of operation into a library.\
 
-## Usage
-Install audio-metadata
+## Dependencies
+* audio-metadata: https://pypi.org/project/audio-metadata/
 ```
 pip install audio-metadata
 ```
-
-## Dependencies
-* audio-metadata (for metadata reading): https://pypi.org/project/audio-metadata/
