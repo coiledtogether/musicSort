@@ -1,83 +1,104 @@
-
 import audio_metadata
 import os
 import re as regex
 from pathlib import Path
 
-# build the file path list
-def buildMasterList(rootDir):
+# global library root
+libRoot = ""
+libFiles = []
 
-    #  file path list to export
-    libFiles = []
-
-    for (root, dirs, files) in os.walk(rootDir, topdown = True):
-        for i in files:
-            k = Path.joinpath(root, i)
-            libFiles.append(k)
-    
-    return libFiles
-
+# formats a string to be only alphanumeric characters, no spaces (they're a pain)
 def formatString(string):
-    
-    # wanted to use isalnum() for this but it was always evaluating false
-    # for any file containing spaces? gotta look into this
+    return regex.sub("[^a-zA-Z0-9]", "", str(string))
 
-    # for char in string:
-    #     if char.isalnum():
-    #         newString += char
-    newString = regex.sub("[^a-zA-Z0-9]", "", str(string))
+# build the master file path list
+def buildMasterList():
 
-    return newString
+    global libFiles
 
-def parseData(filePath):
-    print("trying: " + filePath)
+    for (root, dirs, files) in os.walk(libRoot, topdown = True):
+        for file in files:
+            filePath = Path.joinpath(Path(root), file)
+            libFiles.append(filePath)
 
-    # try to parse track data, break on failure
-    try:
-        currentFile = audio_metadata.load(filePath)
-        currentFileExt = Path(filePath).suffix
+# gets the required metadata from each file
+def getMetadata():
 
-        # get metadata
-        currentArtist = formatString(currentFile.tags.artist)
-        currentAlbum = formatString(currentFile.tags.album)
-        currentSong = formatString(currentFile.tags.title)
-        currentTrack = formatString(currentFile.tags.tracknumber)
+    global libFiles
 
-        # setup correct paths
-        correctDir = Path.joinpath(rootDir, currentArtist)
-        correctDir = Path.joinpath(correctDir, currentAlbum)
-        correctPath = Path.joinpath(correctDir, currentTrack + "_" + currentSong + currentFileExt)
-        # print(correctDir)
-        # print(correctPath)
-    
-    except:
-        print(filePath + " is not an audio file or is an unsupported format")
-        return
+    for filePath in libFiles:
+        
+        # for debugging
+        print("trying: " + str(filePath))
 
-def moveFiles(filePath, correctPath):
-    # do nothing if the file already exists
-    if Path.is_file(correctPath):
-        print("file exists")
-        return
+        # try to parse track data, break on failure
+        try:
+            currentFile = audio_metadata.load(filePath)
+            currentFileExt = Path(filePath).suffix
 
-    # make new directories if needed
-    if not Path.exists(correctDir):
-        os.makedirs(correctDir)
+            # get and return needed metadata from the file
+            filePath = {
+                "path":filePath,
+                "ext":Path(filePath).suffix,
+                "artist":formatString(currentFile.tags.artist),
+                "album":formatString(currentFile.tags.album),
+                "song":formatString(currentFile.tags.title),
+                "track":formatString(currentFile.tags.tracknumber),
+            }
+            
+        except:
+            print(str(filePath) + " is not an audio file or is an unsupported format")
 
-    Path.rename(Path(filePath), correctPath)
+def moveRenameFiles():
+
+    print("Renaming files")
+    global libRoot, libFiles
+
+    for metadata in libFiles:
+
+        # try to setup correct paths
+        try:
+            correctDir = Path.joinpath(libRoot, metadata.get("artist"))
+            correctDir = Path.joinpath(correctDir, metadata.get("album"))
+            correctPath = Path.joinpath(correctDir, metadata.get("track") + "_" + metadata.get("song") + metadata.get("ext"))
+
+        # this will run if not an audio file i.e. cover art
+        except:
+            print("FIX ME")
+            return
+
+        # do nothing if the file already exists
+        if Path.is_file(correctPath):
+            print("file exists")
+            return
+
+        # mkdirs if needed
+        if not Path.exists(correctDir):
+            os.makedirs(correctDir)
+
+        # move the file
+        Path.rename(Path(metadata.get("filePath")), correctPath)
 
 def main():
+
+    global libRoot, libFiles
+
     # set the library root
-    libRoot = input("Enter the root directory of your music library: ")
+    while (True):
+        libRoot = input("Enter the root directory of your music library: ")
+        if Path(libRoot).exists():
+            break
 
     # build the master list of file paths
-    libFiles = buildMasterList(libRoot)
+    buildMasterList()
 
-    # go to each one in sequence
-    for filePath in libFiles:
-        parseData(filePath)
+    # get the requisite data from each audio file
+    getMetadata()
 
-if __name__ == __main__:
+    # move/rename files to new locations
+    moveRenameFiles()
+
+if __name__ == "__main__":
     main()
     
 
