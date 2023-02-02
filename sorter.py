@@ -5,7 +5,7 @@ import re as regex
 from pathlib import Path
 
 # build the file path list
-def buildList(rootDir):
+def buildMasterList(rootDir):
 
     #  file path list to export
     libFiles = []
@@ -17,7 +17,6 @@ def buildList(rootDir):
     
     return libFiles
 
-# inefficient way of formatting strings
 def formatString(string):
     
     # wanted to use isalnum() for this but it was always evaluating false
@@ -67,16 +66,19 @@ def moveFiles(filePath, correctPath):
 
     Path.rename(Path(filePath), correctPath)
 
-# root directory
-rootDir = Path("/home/virtualgirl/Music/akitsa-TEST")
+def main():
+    # set the library root
+    libRoot = input("Enter the root directory of your music library: ")
 
-# master file path list
-libFiles = buildList(rootDir)
+    # build the master list of file paths
+    libFiles = buildMasterList(libRoot)
 
-# go to each one in sequence
-for filePath in libFiles:
-    parseData(filePath)
+    # go to each one in sequence
+    for filePath in libFiles:
+        parseData(filePath)
 
+if __name__ == __main__:
+    main()
     
 
         
